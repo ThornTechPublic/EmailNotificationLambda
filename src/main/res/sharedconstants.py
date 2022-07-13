@@ -1,5 +1,4 @@
 import logging
-import shutil
 import os
 import collections
 import gnupg
