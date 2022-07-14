@@ -11,7 +11,6 @@ SENDER_DISP_NAME = os.getenv("SENDER_DISP_NAME")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 if not SENDER_EMAIL:
     raise EnvironmentError(f"SENDER_EMAIL is required!")
-DEST_DISP_NAME = os.getenv("DEST_DISP_NAME")
 DEST_EMAIL = os.getenv("DEST_EMAIL")
 if not DEST_EMAIL:
     raise EnvironmentError(f"DEST_EMAIL is required!")
