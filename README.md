@@ -2,6 +2,7 @@
 Update deploy folder
 Update src folder
 Add AWS and GCP support
+Compatibility with PGPDecrypt
 
 # Email Alert Add-On
 

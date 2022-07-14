@@ -4,6 +4,7 @@ import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
+from os.path import join, split
 
 
 def substitute_vars(string, provider, location, name, size, hash):
@@ -13,6 +14,9 @@ def substitute_vars(string, provider, location, name, size, hash):
 
 
 def send_email(provider, location, name, size, hash):
+    if not size:
+        logger.info("Blank / Non-existent file. Skipping...")
+        return
     msg = MIMEMultipart("alternative")
     msg["subject"] = substitute_vars(SUBJECT, provider, location, name, size, hash)
     msg["from"] = formataddr((SENDER_DISP_NAME, SENDER_EMAIL))
@@ -27,7 +31,7 @@ Filepath: {name}
 Size: {size}
 Hash: {hash}""", "text")
 
-    with open("../res/email.html") as f:
+    with open(join(split(__file__)[0], "../res/email.html")) as f:
         htmltext = f.read()
     part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size, hash).replace("{LOC_TYPE}", loc_type), "html")
     msg.attach(part1)
