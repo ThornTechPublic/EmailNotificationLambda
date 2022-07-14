@@ -1,0 +1,35 @@
+from res.sharedconstants import *
+from res.emailAlert import send_email
+
+import os
+import sys
+import traceback
+from urllib import parse
+from hashlib import md5
+import re
+
+import azure.functions
+import azure.storage.blob
+
+
+def invoke(event: azure.functions.InputStream):
+    logger.info(f"New event: {event}")
+    url = event.uri
+    url = parse.unquote_plus(url)
+    size = event.length
+    hashhex = md5(event.read()).digesthex()
+    blob_obj = azure.storage.blob.BlobClient.from_blob_url(url)
+    container_name = blob_obj.container_name
+    remote_filepath = blob_obj.blob_name
+    logger.info(f'Azure Event: {container_name}/{remote_filepath} was uploaded')
+    try:
+        logger.info(f'Begin Processing {url}')
+        send_email("Azure", container_name, remote_filepath, size, hashhex)
+    except Exception as ex:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+        message = f'Unexpected error while processing upload {container_name}/{remote_filepath}, with message \"{exc_value}\". \
+                  The file has been moved to the error folder. Stack trace follows: {"".join("!! " + line for line in lines)}'
+        logger.error(message)
+        error_on_az(container_name, remote_filepath)
+        raise ex
