@@ -1,6 +1,10 @@
 # TODO
 Update deploy folder
 Update src folder
+Add AWS and GCP support
+Add group support/multiple receivers
+Test javascript in html email
+Make html template an external file
 
 # Email Alert Add-On
 

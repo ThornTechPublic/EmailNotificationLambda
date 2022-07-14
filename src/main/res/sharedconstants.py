@@ -19,7 +19,7 @@ PASSWORD = os.getenv("PASSWORD")
 if not PASSWORD:
     raise EnvironmentError(f"PASSWORD is required!")
 SMTP_SERVER = os.getenv("SMTP_SERVER", f"smtp.{SENDER_EMAIL.replace('@', '.').split('.')[-2]}.com")
-SUBJECT = os.getenv("SUBJECT", "A file was uploaded to {BUCKET}!") #Intentionally not an f-string!
+SUBJECT = os.getenv("SUBJECT", "A file was uploaded to {LOCATION}!") #Intentionally not an f-string!
 PROTOCOL = os.getenv("PROTOCOL", "TLS").upper()
 if PROTOCOL not in ("TLS", "SSL"):
     raise EnvironmentError(f"Protocol {PROTOCOL} not recognized! Only valid options are TLS and SSL.")
