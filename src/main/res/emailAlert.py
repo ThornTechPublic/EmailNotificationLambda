@@ -20,6 +20,7 @@ def send_email(provider, location, name, size, hash):
     msg = MIMEMultipart("alternative")
     msg["subject"] = substitute_vars(SUBJECT, provider, location, name, size, hash)
     msg["from"] = formataddr((SENDER_DISP_NAME, SENDER_EMAIL))
+    msg["to"] = DEST_EMAIL
     msg["reply-to"] = None
 
     loc_type = "Container" if provider == "Azure" else "Bucket"
@@ -31,9 +32,10 @@ Filepath: {name}
 Size: {size}
 Hash: {hash}""", "text")
 
-    with open(join(split(__file__)[0], "../res/email.html")) as f:
+    with open(join(split(__file__)[0], "email.html")) as f:
         htmltext = f.read()
-    part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size, hash).replace("{LOC_TYPE}", loc_type), "html")
+    part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size,
+                                     hash).replace("{LOC_TYPE}", loc_type), "html")
     msg.attach(part1)
     msg.attach(part2)
 
@@ -50,7 +52,6 @@ Hash: {hash}""", "text")
         else:
             raise RuntimeError("Invalid protocol.")
         server.login(SENDER_EMAIL, PASSWORD)
-        msg["to"] = DEST_EMAIL
         server.send_message(msg)
         print(msg.as_string())
     finally:
