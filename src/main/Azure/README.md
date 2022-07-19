@@ -1,4 +1,4 @@
-# PGP Decrypted Lambda for Azure
+# Email Alert Add-On for Azure
 
 ## Requirements
 
@@ -60,10 +60,46 @@ az functionapp config appsettings set \
     --resource-group <RESOURCE_GROUP_NAME> \
     --settings \
       AzureWebJobsStorage=<Connection string from storage account created in step 4> \
-      AZURE_STORAGE_CONNECTION_STRING=<Connection string for storage account that houses pre-processing, post-processing, and pgp-key containers> \
-      ENCRYPTED_SOURCE_BUCKET=<Container where GPG encrypted files will be uploaded for processing> \
-      DECRYPTED_DONE_LOCATION=<Container where files will be sent after processing> \
-      PGP_KEY_LOCATION=<Container where PGP key file is stored> \
-      PGP_KEY_NAME=<Name of PGP ASC key file> \
-      PGP_PASSPHRASE=<(optional) passphrase for pgp key file if applicable > 
+      AZURE_STORAGE_CONNECTION_STRING=<Connection string for storage account that houses watched container> \
+      SOURCE_LOCATION=<Container which will be watched for new files> \
+      SENDER_EMAIL=<Address to send the alerts from> \
+      DEST_EMAIL=<Comma-Seperated list of emails that will receive the alerts> \
+      PASSWORD=<Password/App Password for the sender email> \
+      SMTP_SERVER=<(optional) Name of SMTP server to use> \
+      SUBJECT=<(optional) pattern of subject line in email> \
+      SENDER_DISP_NAME=<(optional) Display name of sender> \
+      PROTOCOL=<(optional) which protocol to use: SSL/TLS>
 ```
+
+## Deployment through Azure Console
+See our blog's article on the topic: https://thorntech.com/deploying-the-pgp-decryption-add-on-for-sftp-gateway/#AZHeader
+
+## Environment Variables
+These values are passed in as environment variables. Make sure to set all required env vars before running
+
+* Required Variables
+  * SENDER_EMAIL: Email address of sender account
+  * DEST_EMAIL: Email address of receiving account(s)
+    * If you wish to send the email to multiple addresses, set DEST_EMAIL to a comma-seperated list of receiving email addresses
+  * PASSWORD: Password of sender account
+    * This will usually be an app password, such as on Google.
+    * See https://support.google.com/accounts/answer/185833?hl=en
+  * AZURE_STORAGE_CONNECTION_STRING: Connection string to the storage account containing the container to be monitored
+  * SOURCE_LOCATION: Name of container that is to be monitored by the add-on
+* Recommended Variables
+  * SMTP_SERVER: Which SMTP server to use.
+    * Default behavior is to guess the SMTP server based on email, but is not perfect.
+    * See https://sendgrid.com/blog/what-is-an-smtp-server/
+* Optional Variables
+  * SENDER_DISP_NAME: Alias for the sender.
+    * Defaults to None
+  * SUBJECT: Pattern that the subject line will follow. Some values are substituted in at runtime.
+    * Defaults to "A file was uploaded to {LOCATION}!"
+    * Substitutions available: {PROVIDER}, {LOCATION}, {NAME}, {SIZE}, {HASH}, {LOCATION_TYPE}
+  * PROTOCOL: Which protocol to communicate with.
+    * Defaults to "TLS"
+    * Allowed options: "TLS", "SSL"
+  * LOG_LEVEL: Level the logger should be set to
+    * Defaults to "INFO"
+    * Allowed options: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"
+  
