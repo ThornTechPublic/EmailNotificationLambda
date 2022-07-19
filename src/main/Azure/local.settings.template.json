@@ -4,12 +4,15 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "AzureWebJobsStorage": "<Connection string for Function App operational storage account>",
-    "ENCRYPTED_SOURCE_LOCATION": "<Container where GPG encrypted files will be uploaded for processing>",
-    "DECRYPTED_DONE_LOCATION": "<Container where files will be sent after processing>",
-    "AZURE_STORAGE_CONNECTION_STRING": "<Connection string for storage account that houses pre-processing, post-processing, and pgp-key containers>",
-    "PGP_KEY_LOCATION": "<Container where PGP key file is stored>",
-    "PGP_KEY_NAME": "<Name of PGP ASC key file>",
-    "PGP_PASSPHRASE": "<(optional) passphrase for pgp key file if applicable >"
+    "AzureWebJobsStorage": "Connection string from storage account created in step 4",
+    "AZURE_STORAGE_CONNECTION_STRING": "Connection string for storage account that houses watched container",
+    "SOURCE_LOCATION": "Container which will be watched for new files",
+    "SENDER_EMAIL": "Address to send the alerts from",
+    "DEST_EMAIL": "Comma-Seperated list of emails that will receive the alerts",
+    "PASSWORD": "Password/App Password for the sender email",
+    "SMTP_SERVER": "(optional) Name of SMTP server to use",
+    "SUBJECT": "(optional) pattern of subject line in email",
+    "SENDER_DISP_NAME": "(optional) Display name of sender",
+    "PROTOCOL": "(optional) which protocol to use: SSL/TLS"
   }
 }

@@ -65,7 +65,10 @@ az functionapp config appsettings set \
       SENDER_EMAIL=<Address to send the alerts from> \
       DEST_EMAIL=<Comma-Seperated list of emails that will receive the alerts> \
       PASSWORD=<Password/App Password for the sender email> \
-      SMTP_SERVER=<(optional) Name of SMTP server to use> 
+      SMTP_SERVER=<(optional) Name of SMTP server to use> \
+      SUBJECT=<(optional) pattern of subject line in email> \
+      SENDER_DISP_NAME=<(optional) Display name of sender> \
+      PROTOCOL=<(optional) which protocol to use: SSL/TLS>
 ```
 
 ## Deployment through Azure Console
