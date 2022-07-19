@@ -1,6 +1,10 @@
 import logging
 import os
 
+SMTP_SERVER_DICT = {"aol": "smtp.aol.com", "att": "smtp.mail.att.net", "comcast": "smtp.comcast.net",
+                    "icloud": "smtp.mail.me.com", "gmail": "smtp.gmail.com", "outlook": "stmp-mail.outlook.com",
+                    "yahoo": "smtp.mail.yahoo.com"}
+
 # Logger
 logger = logging.getLogger()
 logger.setLevel(logging.getLevelName(os.getenv('LOG_LEVEL', default='INFO')))
@@ -17,7 +21,10 @@ if not DEST_EMAIL:
 PASSWORD = os.getenv("PASSWORD")
 if not PASSWORD:
     raise EnvironmentError(f"PASSWORD is required!")
-SMTP_SERVER = os.getenv("SMTP_SERVER", f"smtp.{SENDER_EMAIL.replace('@', '.').split('.')[-2]}.com")
+SMTP_SERVER = os.getenv("SMTP_SERVER")
+if not SMTP_SERVER:
+    domain = SENDER_EMAIL.replace('@', '.').split('.')[-2:]
+    SMTP_SERVER = SMTP_SERVER_DICT.get(domain[0].lower(), f"smtp.{domain[0]}.{domain[1]}")
 SUBJECT = os.getenv("SUBJECT", "A file was uploaded to {LOCATION}!") #Intentionally not an f-string!
 PROTOCOL = os.getenv("PROTOCOL", "TLS").upper()
 if PROTOCOL not in ("TLS", "SSL"):

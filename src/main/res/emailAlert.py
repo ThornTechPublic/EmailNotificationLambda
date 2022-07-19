@@ -9,8 +9,9 @@ from os.path import join, split
 
 def substitute_vars(string, provider, location, name, size, hash):
     size = str(size)
+    loc_type = "Container" if provider == "Azure" else "Bucket"
     return string.replace("{PROVIDER}", provider).replace("{LOCATION}", location).replace("{NAME}", name).replace(
-        "{SIZE}", size).replace("{HASH}", hash)
+        "{SIZE}", size).replace("{HASH}", hash).replace("{LOCATION_TYPE}", loc_type)
 
 
 def send_email(provider, location, name, size, hash):
@@ -30,12 +31,11 @@ Cloud Provider: {provider}
 {loc_type}: {location}
 Filepath: {name}
 Size: {size}
-Hash: {hash}""", "text")
+MD5: {hash}""", "text")
 
     with open(join(split(__file__)[0], "email.html")) as f:
         htmltext = f.read()
-    part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size,
-                                     hash).replace("{LOC_TYPE}", loc_type), "html")
+    part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size, hash), "html")
     msg.attach(part1)
     msg.attach(part2)
 

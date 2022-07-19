@@ -2,7 +2,6 @@
 Update deploy folder
 Update src folder
 Add AWS and GCP support
-Compatibility with PGPDecrypt
 
 # Email Alert Add-On
 
@@ -51,8 +50,6 @@ which sends an SMTP message.
 2. run `pipenv install -r src/requriement.txt`
 
 ## Shared Module
-All cloud providers use the `src/main/res/` module and its contents for pgp decryption. Before deploying to any 
+All cloud providers use the `src/main/res/` module and its contents for sending emails. Before deploying to any 
 cloud provider you should copy the contents of the res directory into the provider specific res directory. 
 
-
-  
