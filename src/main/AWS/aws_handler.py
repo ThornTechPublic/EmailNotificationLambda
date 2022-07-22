@@ -13,6 +13,8 @@ def invoke(event, context):
         remote_filepath = parse.unquote_plus(record['s3']['object']['key'])
         size = record['s3']['object']['size']
         md5hash = record['s3']['object']['eTag']
+        if '-' in md5hash or len(md5hash) != 32:
+            md5hash = "File too large"
 
         try:
             logger.info(f'Begin Processing s3://{bucket}/{remote_filepath}')

@@ -1,5 +1,5 @@
-from res.sharedconstants import *
-from res.emailAlert import send_email
+from src.main.res.sharedconstants import *
+from src.main.res.emailAlert import send_email
 
 import sys
 import traceback
@@ -21,6 +21,7 @@ def invoke(event: azure.functions.InputStream):
     container_name = blob_obj.container_name
     remote_filepath = blob_obj.blob_name
     logger.info(f'Azure Event: {container_name}/{remote_filepath} was uploaded')
+
     try:
         logger.info(f'Begin Processing {url}')
         send_email("Azure", f"{account_name}/{container_name}", remote_filepath, size, hashhex)
