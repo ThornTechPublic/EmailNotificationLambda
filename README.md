@@ -1,8 +1,3 @@
-# TODO
-Update deploy folder
-Update src folder
-Add AWS and GCP support
-
 # Email Alert Add-On
 
 ## What is Email Alert Add-On
