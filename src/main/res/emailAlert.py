@@ -24,20 +24,15 @@ def send_email(provider, location, name, size, hash):
     msg["to"] = DEST_EMAIL
     msg["reply-to"] = None
 
-    loc_type = "Container" if provider == "Azure" else "Bucket"
+    with open(join(split(__file__)[0], "email.txt"), 'r') as f:
+        text = f.read()
+        part1 = MIMEText(substitute_vars(text, provider, location, name, size, hash), "text")
+        msg.attach(part1)
 
-    part1 = MIMEText(f"""This email has been sent because a file was uploaded to cloud storage.
-Cloud Provider: {provider}
-{loc_type}: {location}
-Filepath: {name}
-Size: {size}
-MD5: {hash}""", "text")
-
-    with open(join(split(__file__)[0], "email.html")) as f:
+    with open(join(split(__file__)[0], "email.html"), 'r') as f:
         htmltext = f.read()
-    part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size, hash), "html")
-    msg.attach(part1)
-    msg.attach(part2)
+        part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size, hash), "html")
+        msg.attach(part2)
 
     context = ssl.create_default_context()
     server = None
@@ -49,6 +44,8 @@ MD5: {hash}""", "text")
         elif PROTOCOL == "SSL":
             port = 465
             server = smtplib.SMTP_SSL(SMTP_SERVER, port, context=context)
+        # I doubt it but if someone wants to have the option of choosing no TLS/SSL,
+        # you need an elif here and to edit the tuple in sharedconstants.py line 30
         else:
             raise RuntimeError("Invalid protocol.")
         server.login(SENDER_EMAIL, PASSWORD)

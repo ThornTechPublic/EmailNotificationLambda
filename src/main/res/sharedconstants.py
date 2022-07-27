@@ -25,10 +25,7 @@ SMTP_SERVER = os.getenv("SMTP_SERVER")
 if not SMTP_SERVER:
     domain = SENDER_EMAIL.replace('@', '.').split('.')[-2:]
     SMTP_SERVER = SMTP_SERVER_DICT.get(domain[0].lower(), f"smtp.{domain[0]}.{domain[1]}")
-SUBJECT = os.getenv("SUBJECT", "A file was uploaded to {LOCATION}!") #Intentionally not an f-string!
+SUBJECT = os.getenv("SUBJECT", "A file was uploaded to {LOCATION}!")  # Intentionally not an f-string!
 PROTOCOL = os.getenv("PROTOCOL", "TLS").upper()
 if PROTOCOL not in ("TLS", "SSL"):
     raise EnvironmentError(f"Protocol {PROTOCOL} not recognized! Only valid options are TLS and SSL.")
-
-trim_path_to_filename = os.path.basename
-trim_path_to_directory = os.path.dirname

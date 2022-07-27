@@ -9,4 +9,4 @@ with open("azevent.json", "r") as f:
 event_data["data"] = base64.standard_b64decode(event_data["data"].encode("UTF-8"))
 event = func.InputStream(**event_data)
 
-print(event.name, event.uri, event.length, len(event.read()))
+print(event.name, event.uri, event.length, event.length == len(event.read()))
