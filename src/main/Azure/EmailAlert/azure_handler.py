@@ -15,7 +15,7 @@ def invoke(event: azure.functions.InputStream):
     url = event.uri
     url = parse.unquote_plus(url)
     size = event.length
-    hashhex = md5(event.read()).hexdigest()
+    md5hash = md5(event.read()).hexdigest()
     blob_obj = azure.storage.blob.BlobClient.from_blob_url(url)
     account_name = blob_obj.account_name
     container_name = blob_obj.container_name
@@ -24,7 +24,7 @@ def invoke(event: azure.functions.InputStream):
 
     try:
         logger.info(f'Begin Processing {url}')
-        send_email("Azure", f"{account_name}/{container_name}", remote_filepath, size, hashhex)
+        send_email("Azure", f"{account_name}/{container_name}", remote_filepath, size, md5hash)
     except Exception as ex:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         lines = traceback.format_exception(exc_type, exc_value, exc_traceback)

@@ -5,33 +5,39 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
 from os.path import join, split
+import re
 
 
-def substitute_vars(string, provider, location, name, size, hash):
-    size = str(size)
+def substitute_vars(string, provider, location, name, size, md5hash, **kwargs):
     loc_type = "Container" if provider == "Azure" else "Bucket"
-    return string.replace("{PROVIDER}", provider).replace("{LOCATION}", location).replace("{NAME}", name).replace(
-        "{SIZE}", size).replace("{HASH}", hash).replace("{LOCATION_TYPE}", loc_type)
+    match_obj = re.match(r"users/(.+?)/.+", name)
+    user = "None" if match_obj is None else match_obj.group(1)
+    subs_dict = {"{PROVIDER}": provider, "{LOCATION}": location, "{NAME}": name, "{SIZE}": size, "{HASH}": md5hash,
+                 "{LOCATION_TYPE}": loc_type, "{USER}": user}
+    subs_dict.update({k.upper().join("{}"): v for k, v in kwargs.items()})
+    for k, v in subs_dict.items():
+        string = string.replace(k, str(v))
+    return string
 
 
-def send_email(provider, location, name, size, hash):
+def send_email(provider, location, name, size, md5hash, **kwargs):
     if not size:
         logger.info("Blank / Non-existent file. Skipping...")
         return
     msg = MIMEMultipart("alternative")
-    msg["subject"] = substitute_vars(SUBJECT, provider, location, name, size, hash)
+    msg["subject"] = substitute_vars(SUBJECT, provider, location, name, size, md5hash, **kwargs)
     msg["from"] = formataddr((SENDER_DISP_NAME, SENDER_EMAIL))
     msg["to"] = DEST_EMAIL
     msg["reply-to"] = None
 
     with open(join(split(__file__)[0], "email.txt"), 'r') as f:
         text = f.read()
-        part1 = MIMEText(substitute_vars(text, provider, location, name, size, hash), "text")
+        part1 = MIMEText(substitute_vars(text, provider, location, name, size, md5hash, **kwargs), "text")
         msg.attach(part1)
 
     with open(join(split(__file__)[0], "email.html"), 'r') as f:
         htmltext = f.read()
-        part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size, hash), "html")
+        part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size, md5hash, **kwargs), "html")
         msg.attach(part2)
 
     context = ssl.create_default_context()
@@ -50,7 +56,12 @@ def send_email(provider, location, name, size, hash):
             raise RuntimeError("Invalid protocol.")
         server.login(SENDER_EMAIL, PASSWORD)
         server.send_message(msg)
-        print(msg.as_string())
+        logger.info(msg.as_string())
+        logger.info("Message sent!")
+    except Exception:
+        logger.error("Message not sent!")
+        raise
     finally:
         if server is not None:
+            logger.info("Quitting server")
             server.quit()
