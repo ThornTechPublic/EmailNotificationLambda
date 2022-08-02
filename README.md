@@ -56,8 +56,7 @@ In order to send custom emails, edit or replace the email.html and email.txt fil
 At runtime, the program will substitute some values in as follows (without the quotation marks):
 
 * "{PROVIDER}": Cloud provider that received the file.
-* "{LOCATION}": Bucket or container that the file is in.
-  * On Azure this is the storage account followed by the container. EX: "{storage account}/{container name}"
+* "{LOCATION}": Bucket or container that the file is in. On Azure this is the storage account followed by the container. EX: "{storage account}/{container name}"
 * "{FILEPATH}": Filepath of remote file (including folders). EX: users/user1/testfile.txt
 * "{DIRECTORY}": Directory of the remote file. EX: users/user1
 * "{FILENAME}": Filename of remote file (excluding folders). EX: testfile.txt
