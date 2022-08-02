@@ -1,9 +1,14 @@
 import os
-from email.headerregistry import Address, Group, AddressHeader
+import sys
 
-os.environ["SENDER_EMAIL"] = "joshbrown@thorntechnologies.com"
+try:
+    email_addr = sys.argv[1]
+except IndexError:
+    email_addr = input("What email address are you using? ")
+
+os.environ["SENDER_EMAIL"] = email_addr
 os.environ["SENDER_DISP_NAME"] = "EAA Sys"
-os.environ["DEST_EMAIL"] = "joshbrown@thorntechnologies.com"
+os.environ["DEST_EMAIL"] = email_addr
 os.environ["SMTP_SERVER"] = "smtp.gmail.com"
 
 with open("apppass") as f:

@@ -7,108 +7,55 @@
 
 1. Navigate to [AWS ECR](https://console.aws.amazon.com/ecr/get-started)
 2. Create a new ECR repository
-3. Build the docker image from the `src/main` directory by running `docker build -f AWSDockerfile -t pgplambda .`
+3. Build the docker image from the `src/main` directory by running `docker build -f AWSDockerfile -t emailalert .`
 4. Follow the instructions from the ECR repository `View Push Commands` button to tag and push the image to the ECR
    repository
 6. Go to [AWS Lambda](https://console.aws.amazon.com/lambda/home)
 7. Create a new Container image function
 8. Browse to your ECR image and create
 9. Once the function has been created, go to its configuration tab and set up
-   the [environment variables](#lambda-environment-variables) bellow
-10. Configure [permissions](#lambda-required-permissions) bellow on the lambda execution role
+   the [environment variables](#lambda-environment-variables) below
 
-Now the PGP lambda should be fully operational, and you can configure the [S3 Event](#bucket-setup) to trigger the
+Now the email alert lambda should be fully operational, and you can configure the [S3 Event](#bucket-setup) to trigger the
 lambda when a file is uploaded to the bucket.
-
-## Cloud Formation Deployment
-
-**_NOTE:_** This section is for the original AWS Lambda that used lambda layers and will be reworked soon.
-
-Using the SAM CLI deploy the template.yaml file.
-
-### Template Parameters
-
-```yaml
-PgpKeyLocation:
-    Type: String
-    Description: "S3 bucket where the PGP private key is located"
-PgpKeyName:
-    Type: String
-    Description: "Name of the PGP private key"
-DecryptedTargetBucket:
-    Type: String
-    Description: "S3 Bucket where files will land lambda decryption"
-EncryptedSourceBucket:
-    Type: String
-    Description: "S3 Bucket that triggers lambda to decrypt files. Needed for permissions"
-```
-
-### Lambda Environment Variables
-
-```yaml
-LOG_LEVEL:
-    Allowed Values: [ CRITICAL | ERROR | WARNING | INFO | DEBUG | NOTSET ]
-    Description: "(Optional) Set log level if desired."
-    Default: INFO
-    Type: String
-PGP_PASSPHRASE:
-    Type: String
-    Description: "(Optional) Set PGP Key passphrase if applicable "
-    Default: None
-PGP_KEY_LOCATION:
-    Type: String
-    Description: "S3 bucket where the PGP private key is located"
-PGP_KEY_NAME:
-    Type: String
-    Description: "Name of the PGP private key"
-DECRYPTED_DONE_LOCATION:
-    Type: String
-    Description: "S3 Bucket where files will land lambda decryption"
-ARCHIVE:
-    Type: Boolean
-    Default: false
-    Descritption: "(Optional) If true, files that have already been decrypted will be moved into an archive folder in the source bucket"
-ERROR:
-    Type: Boolean
-    Default: false
-    Descritption: "(Optional) If true, files that encounter an error will decrypting will be moved into an error folder in the source bucket"
-```
 
 ## Bucket setup
 
 1. In the S3 console, go to the SFTP Gateway default bucket
-1. In the properties tab, open the Events section
-1. Click Add notification
-1. Name the notification `gpg-file-uploaded`, select Event `PUT`, enter the `.gpg` Suffix, select Send to Lambda
-   Funcation, and select the pgp-file-decrypter-PgpLambda
-1. Repeat previous step for `.pgp` files
+2. In the properties tab, open the Events section
+3. Click Add notification
+4. Name the notification anything you want, select Event "All object create events", and leave Prefix and Suffix blank,
+    select Send to Lambda Function, and select the lambda
 
 ## Lambda required permissions
 
-The pgp lambda will require the following permissions to create log streams in CloudWatch and acess the file and key
-buckets.
+The email alert lambda will require the following permissions to create log streams in CloudWatch
 
 * AWSLambdaBasicExecutionRole
-* Policy listing bucket and accessing file objects in those buckets
-    ```yaml
-    Policies:
-      - Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Action:
-              - "s3:ListBucket"
-            Resource:
-              - !Sub "arn:aws:s3:::<DECRYPTED_DONE_LOCATION>"
-              - !Sub "arn:aws:s3:::<EncryptedSourceBucket>"
-              - !Sub "arn:aws:s3:::<PGP_KEY_LOCATION>"
-          - Effect: "Allow"
-            Action:
-              - "s3:PutObject"
-              - "s3:GetObject"
-              - "s3:DeleteObject"
-            Resource:
-              - !Sub "arn:aws:s3:::<DECRYPTED_DONE_LOCATION>/*"
-              - !Sub "arn:aws:s3:::<EncryptedSourceBucket>/*"
-              - !Sub "arn:aws:s3:::<PGP_KEY_LOCATION>/*"
 
-    ```
+## Environment Variable
+These values are passed in as environment variables. Make sure to set all required env vars before running
+
+* Required Variables
+    * SENDER_EMAIL: Email address of sender account
+    * DEST_EMAIL: Email address of receiving account(s)
+        * If you wish to send the email to multiple addresses, set DEST_EMAIL to a comma-seperated list of receiving email addresses
+    * PASSWORD: Password of sender account
+        * This will usually be an app password, such as on Google.
+        * See https://support.google.com/accounts/answer/185833?hl=en
+* Recommended Variables
+    * SMTP_SERVER: Which SMTP server to use.
+        * Default behavior is to guess the SMTP server based on email, but is not perfect.
+        * See https://sendgrid.com/blog/what-is-an-smtp-server/
+* Optional Variables
+    * SENDER_DISP_NAME: Alias for the sender.
+        * Defaults to None
+    * SUBJECT: Pattern that the subject line will follow. Some values are substituted in at runtime.
+        * Defaults to "A file was uploaded to {LOCATION}!"
+        * Substitutions available: {PROVIDER}, {LOCATION}, {NAME}, {SIZE}, {HASH}, {LOCATION_TYPE}
+    * PROTOCOL: Which protocol to communicate with.
+        * Defaults to "TLS"
+        * Allowed options: "TLS", "SSL"
+    * LOG_LEVEL: Level the logger should be set to
+        * Defaults to "INFO"
+        * Allowed options: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"

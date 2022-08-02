@@ -1,0 +1,6 @@
+This email has been sent because a file was uploaded to cloud storage.
+Cloud Provider: {PROVIDER}
+{LOCATION_TYPE}: {LOCATION}
+Filepath: {FILEPATH}
+Size: {SIZE}
+MD5: {HASH}
