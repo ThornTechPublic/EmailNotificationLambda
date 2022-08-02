@@ -54,6 +54,7 @@ The html file is the main representation while the txt file is the non-html back
 In order to send custom emails, edit or replace the email.html and email.txt files with the template you want.
 
 At runtime, the program will substitute some values in as follows (without the quotation marks):
+
 * "{PROVIDER}": Cloud provider that received the file.
 * "{LOCATION}": Bucket or container that the file is in.
   * On Azure this is the storage account followed by the container. EX: "{storage account}/{container name}"
@@ -66,10 +67,12 @@ At runtime, the program will substitute some values in as follows (without the q
 * "{USER}": Name of user folder that was uploaded to. EX: If uploaded to users/user1/..., {USER} substitutes to "user1".
 
 Azure only substitutions:
+
 * "{STORAGE_ACCOUNT}": Name of storage account that is uploaded to.
 * "{CONTAINER}": Name of container that is uploaded to.
 
 AWS and GCP only substitutions:
+
 * "{BUCKET}": Name of bucket that is uploaded to. (Alias of {LOCATION} substitution)
 
 In the event that a substitution cannot be found, no error is raised and the text is left alone.
