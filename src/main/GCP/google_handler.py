@@ -16,7 +16,7 @@ def invoke(event, context):
 
     try:
         logger.info(f'Begin Processing gcp://{bucket_name}/{remote_filepath}')
-        send_email("GCP", bucket_name, remote_filepath, size, md5hash)
+        send_email("GCP", bucket_name, remote_filepath, size, md5hash, bucket=bucket_name)
     except Exception as ex:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         lines = traceback.format_exception(exc_type, exc_value, exc_traceback)

@@ -8,36 +8,37 @@ from os.path import join, split
 import re
 
 
-def substitute_vars(string, provider, location, name, size, md5hash, **kwargs):
+def substitute_vars(string, provider, location, filepath, size, md5hash, **kwargs):
     loc_type = "Container" if provider == "Azure" else "Bucket"
-    match_obj = re.match(r"users/(.+?)/.+", name)
+    match_obj = re.match(r"users/(.+?)/.+", filepath)
     user = "None" if match_obj is None else match_obj.group(1)
-    subs_dict = {"{PROVIDER}": provider, "{LOCATION}": location, "{NAME}": name, "{SIZE}": size, "{HASH}": md5hash,
-                 "{LOCATION_TYPE}": loc_type, "{USER}": user}
+    directory, filename = split(filepath)
+    subs_dict = {"{PROVIDER}": provider, "{LOCATION}": location, "{FILEPATH}": filepath, "{SIZE}": size, "{HASH}": md5hash,
+                 "{LOCATION_TYPE}": loc_type, "{USER}": user, "{DIRECTORY}": directory, "{FILENAME}": filename}
     subs_dict.update({k.upper().join("{}"): v for k, v in kwargs.items()})
     for k, v in subs_dict.items():
         string = string.replace(k, str(v))
     return string
 
 
-def send_email(provider, location, name, size, md5hash, **kwargs):
+def send_email(provider, location, filepath, size, md5hash, **kwargs):
     if not size:
         logger.info("Blank / Non-existent file. Skipping...")
         return
     msg = MIMEMultipart("alternative")
-    msg["subject"] = substitute_vars(SUBJECT, provider, location, name, size, md5hash, **kwargs)
+    msg["subject"] = substitute_vars(SUBJECT, provider, location, filepath, size, md5hash, **kwargs)
     msg["from"] = formataddr((SENDER_DISP_NAME, SENDER_EMAIL))
     msg["to"] = DEST_EMAIL
     msg["reply-to"] = None
 
     with open(join(split(__file__)[0], "email.txt"), 'r') as f:
         text = f.read()
-        part1 = MIMEText(substitute_vars(text, provider, location, name, size, md5hash, **kwargs), "text")
+        part1 = MIMEText(substitute_vars(text, provider, location, filepath, size, md5hash, **kwargs), "text")
         msg.attach(part1)
 
     with open(join(split(__file__)[0], "email.html"), 'r') as f:
         htmltext = f.read()
-        part2 = MIMEText(substitute_vars(htmltext, provider, location, name, size, md5hash, **kwargs), "html")
+        part2 = MIMEText(substitute_vars(htmltext, provider, location, filepath, size, md5hash, **kwargs), "html")
         msg.attach(part2)
 
     context = ssl.create_default_context()

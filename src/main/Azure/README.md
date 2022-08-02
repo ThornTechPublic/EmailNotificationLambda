@@ -72,7 +72,7 @@ az functionapp config appsettings set \
 ```
 
 ## Deployment through Azure Console
-See our blog's article on the topic: https://thorntech.com/deploying-the-pgp-decryption-add-on-for-sftp-gateway/#AZHeader
+See our blog's article on the topic: https://thorntech.com/deploy-email-alert-add-on-for-sftp-gateway/#AZHeader
 
 ## Environment Variables
 These values are passed in as environment variables. Make sure to set all required env vars before running

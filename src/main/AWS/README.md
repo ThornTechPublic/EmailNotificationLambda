@@ -14,8 +14,7 @@
 7. Create a new Container image function
 8. Browse to your ECR image and create
 9. Once the function has been created, go to its configuration tab and set up
-   the [environment variables](#lambda-environment-variables) bellow
-10. Configure [permissions](#lambda-required-permissions) bellow on the lambda execution role
+   the [environment variables](#lambda-environment-variables) below
 
 Now the email alert lambda should be fully operational, and you can configure the [S3 Event](#bucket-setup) to trigger the
 lambda when a file is uploaded to the bucket.

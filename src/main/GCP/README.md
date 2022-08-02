@@ -17,7 +17,7 @@ This will outline the steps needed to create a zip packages and deploy it to GCP
 8. In the runtime selector, choose `Python 3.9`
 9. In the source code selector, choose `ZIP Upload`
 10. Set the Entry Point to `invoke`
-11. Browse to the `depoy/GCP/emailAlertGoogleArchive.zip`
+11. Browse to the `deploy/GCP/emailAlertGoogleArchive.zip`
 12. Set a staging bucket for the zip file to be deployed from
 13. Finally, hit Deploy
     Once the functions is finished deploying any file uploaded to the watched bucket will automatically be

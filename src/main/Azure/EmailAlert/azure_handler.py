@@ -24,7 +24,8 @@ def invoke(event: azure.functions.InputStream):
 
     try:
         logger.info(f'Begin Processing {url}')
-        send_email("Azure", f"{account_name}/{container_name}", remote_filepath, size, md5hash)
+        send_email("Azure", f"{account_name}/{container_name}", remote_filepath, size, md5hash,
+                   storage_account=account_name, container=container_name)
     except Exception as ex:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
